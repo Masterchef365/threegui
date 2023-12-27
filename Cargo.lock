@@ -2194,6 +2194,7 @@ dependencies = [
  "eframe",
  "egui",
  "glam",
+ "mint",
 ]
 
 [[package]]
