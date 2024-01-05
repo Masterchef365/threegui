@@ -91,7 +91,7 @@ pub struct ArcBallController {
 
 impl Perspective {
     pub fn matrix(&self, width: f32, height: f32) -> Mat4 {
-        Mat4::perspective_rh(self.fov, width / height, self.fov, self.clip_near, self.clip_far)
+        Mat4::perspective_rh(self.fov, width / height, self.clip_near, self.clip_far)
     }
 }
 
