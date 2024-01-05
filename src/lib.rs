@@ -39,7 +39,8 @@ impl Transform {
         let pre: glam::Vec4 = self.mat * world.extend(1.);
 
         //dbg!(self.mat);
-        dbg!(pre.z);
+        //dbg!(pre.z, world.z);
+        dbg!(self.mat);
 
         // Perspective division
         let mut dc = pre.xyz() / pre.w;
@@ -180,6 +181,7 @@ impl ThreeWidget {
         let proj = camera.projection(resp.rect.width(), resp.rect.height());
         let camera_tf = proj * camera.view();
         let tf = Transform::new(camera_tf, resp.rect);
+        dbg!(camera_tf);
 
         let mut three_ui = ThreeUi::new(ui.painter_at(resp.rect), tf);
 
