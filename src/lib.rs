@@ -129,20 +129,20 @@ pub fn threegui(ui: &mut egui::Ui, user_func: impl FnMut(&mut ThreeUi) + Sized) 
 }
 
 pub struct ThreeWidget {
-    max_size: egui::Vec2,
+    desired_size: egui::Vec2,
     id: egui::Id,
 }
 
 impl ThreeWidget {
     pub fn new(id: impl Into<egui::Id>) -> Self {
         Self {
-            max_size: egui::Vec2::INFINITY,
+            desired_size: egui::Vec2::new(500., 400.),
             id: id.into(),
         }
     }
 
-    pub fn with_max_size(mut self, size: egui::Vec2) -> Self {
-        self.max_size = size;
+    pub fn with_desired_size(mut self, size: egui::Vec2) -> Self {
+        self.desired_size = size;
         self
     }
 
@@ -152,8 +152,7 @@ impl ThreeWidget {
         mut user_func: impl FnMut(&mut ThreeUi) + Sized,
     ) -> egui::Response {
         // Allocate area to draw
-        let desired_size = ui.available_size().min(self.max_size);
-        let resp = ui.allocate_response(desired_size, egui::Sense::click_and_drag());
+        let resp = ui.allocate_response(self.desired_size, egui::Sense::click_and_drag());
 
         // Get some inputs for the camera
         let mut camera = ui.data_mut(|data| data.get_persisted_mut_or_default::<Camera>(self.id).clone());
@@ -169,7 +168,7 @@ impl ThreeWidget {
         let camera_tf = proj * camera.view();
         let tf = Transform::new(camera_tf, resp.rect);
 
-        let mut three_ui = ThreeUi::new(ui.painter().clone(), tf);
+        let mut three_ui = ThreeUi::new(ui.painter_at(resp.rect), tf);
 
         user_func(&mut three_ui);
 
