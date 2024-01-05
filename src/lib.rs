@@ -38,10 +38,6 @@ impl Transform {
         // World to "device coordinates"
         let pre: glam::Vec4 = self.mat * world.extend(1.);
 
-        //dbg!(self.mat);
-        //dbg!(pre.z, world.z);
-        dbg!(self.mat);
-
         // Perspective division
         let mut dc = pre.xyz() / pre.w;
 
@@ -100,7 +96,7 @@ impl Painter3D {
     fn transform(&self, pt: Vec3) -> Option<egui::Pos2> {
         let (sc, z) = self.transform.world_to_egui(pt);
 
-        (z > 0.0).then(|| sc.to_pos2())
+        (0.0..=1.0).contains(&z).then(|| sc.to_pos2())
     }
 
     /*
@@ -181,7 +177,6 @@ impl ThreeWidget {
         let proj = camera.projection(resp.rect.width(), resp.rect.height());
         let camera_tf = proj * camera.view();
         let tf = Transform::new(camera_tf, resp.rect);
-        dbg!(camera_tf);
 
         let mut three_ui = ThreeUi::new(ui.painter_at(resp.rect), tf);
 
