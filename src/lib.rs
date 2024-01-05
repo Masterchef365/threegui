@@ -34,10 +34,6 @@ impl Transform {
     }
 
     pub fn world_to_egui(&self, world: glam::Vec3) -> egui::Vec2 {
-        // Get the transform that puts the model on the screen
-        let rect_offset: mint::Vector2<f32> = self.rect.min.to_vec2().into();
-        let rect_offset: Mat4 = Mat4::from_mat3(Mat3::from_translation(rect_offset.into()));
-
         let pre: glam::Vec4 = self.mat * world.extend(1.);
 
         // Perspective division
@@ -50,7 +46,9 @@ impl Transform {
         let v = v * glam::Vec2::new(self.rect.width(), self.rect.height());
 
         let v: mint::Vector2<f32> = v.into();
-        v.into()
+        let v: egui::Vec2 = v.into();
+
+        v + self.rect.min.to_vec2()
     }
 
     pub fn egui_to_world(&self, egui: egui::Vec2, z: f32) -> glam::Vec3 {
