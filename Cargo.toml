@@ -6,7 +6,6 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-# TODO: egui could be an optional dependency, epaint is the actual hard dep.
 egui = { version = "0.24.1", features = ["mint"] }
 glam = { version = "0.25.0", features = ["mint"] }
 mint = "0.5.9"
