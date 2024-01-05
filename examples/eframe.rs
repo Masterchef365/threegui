@@ -41,6 +41,22 @@ impl eframe::App for MyEguiApp {
                     Vec3::new(0.2, -0.4, 0.9),
                     Stroke::new(1., Color32::LIGHT_BLUE),
                 );
+
+                let k = 10;
+                let f = k as f32;
+                for i in -k..=k {
+                    paint.line(
+                        Vec3::new(-1., 0., i as f32 / f),
+                        Vec3::new(1., 0., i as f32 / f),
+                        Stroke::new(1., Color32::WHITE),
+                    );
+
+                    paint.line(
+                        Vec3::new(i as f32 / f, 0., -1.),
+                        Vec3::new(i as f32 / f, 0., 1.),
+                        Stroke::new(1., Color32::WHITE),
+                    );
+                }
             })
         });
     }

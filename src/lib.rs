@@ -41,7 +41,11 @@ impl Transform {
         let pre: glam::Vec4 = self.mat * world.extend(1.);
 
         // Perspective division
-        let v = pre.xy() / pre.w;
+        let mut v = pre.xy() / pre.w;
+
+        // Invert Y
+        v.y *= -1.0;
+
         let v = (v + 1.) / 2.;
         let v = v * glam::Vec2::new(self.rect.width(), self.rect.height());
 
