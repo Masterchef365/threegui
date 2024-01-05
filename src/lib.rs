@@ -19,36 +19,31 @@ pub struct Painter3D {
 // TODO: enum allowing custom transforms
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct Transform {
+    rect: egui::Rect,
     mat: Mat4,
     inverse: Mat4,
 }
 
 impl Transform {
-    pub fn identity() -> Self {
-        Self::from(Mat4::IDENTITY)
-    }
-
-    pub fn perspective(fov_y_radians: f32, aspect_ratio: f32, z_near: f32, z_far: f32) -> Self {
-        Self::from(Mat4::perspective_rh(
-            fov_y_radians,
-            aspect_ratio,
-            z_near,
-            z_far,
-        ))
-    }
-
-    pub fn orthographic(left: f32, right: f32, bottom: f32, top: f32, near: f32, far: f32) -> Self {
-        Self::from(Mat4::orthographic_rh(left, right, bottom, top, near, far))
+    pub fn new(mat: Mat4, rect: egui::Rect) -> Self {
+        Self {
+            rect,
+            inverse: mat.inverse(),
+            mat,
+        }
     }
 
     pub fn world_to_egui(&self, world: glam::Vec3) -> egui::Vec2 {
-        let pre: glam::Vec4 = self.mat * world.extend(1.);
+        // Get the transform that puts the model on the screen
+        let rect_offset: mint::Vector2<f32> = self.rect.min.to_vec2().into();
+        let rect_offset: Mat4 = Mat4::from_mat3(Mat3::from_translation(rect_offset.into()));
 
-        dbg!(self.mat);
+        let pre: glam::Vec4 = self.mat * world.extend(1.);
 
         // Perspective division
         let v = pre.xy() / pre.w;
-        dbg!(v);
+        let v = (v + 1.) / 2.;
+        let v = v * glam::Vec2::new(self.rect.width(), self.rect.height());
 
         let v: mint::Vector2<f32> = v.into();
         v.into()
@@ -64,25 +59,18 @@ impl Transform {
         todo!()
     }
 
+    /*
     /// Returns a Transform which has the given transformation prepended
     pub fn prepend(&self, tf: Transform) -> Transform {
         Self::from(tf.mat * self.mat)
     }
-}
-
-impl From<Mat4> for Transform {
-    fn from(mat: Mat4) -> Self {
-        Self {
-            inverse: mat.inverse(),
-            mat,
-        }
-    }
+    */
 }
 
 impl Painter3D {
     pub fn new(painter_2d: egui::Painter, transform: Transform) -> Self {
         Self {
-            transform: Transform::identity(),
+            transform,
             painter_2d,
         }
     }
@@ -97,6 +85,7 @@ impl Painter3D {
         self.transform.world_to_egui(pt)
     }
 
+    /*
     /// Returns a painter which has the given transformation prepended
     pub fn transform(&self, mat: Mat4) -> Self {
         Self {
@@ -105,6 +94,7 @@ impl Painter3D {
             painter_2d: self.painter_2d.clone(),
         }
     }
+    */
 }
 
 pub struct ThreeUi {
@@ -171,13 +161,9 @@ impl ThreeWidget {
             // NOTE: Cannot use handle_response here as it deadlocks due to Response's Context
         });
 
-        // Get the transform that puts the model on the screen
-        let rect_offset: mint::Vector2<f32> = resp.rect.min.to_vec2().into();
-        let rect_offset: Mat4 = Mat4::from_mat3(Mat3::from_translation(rect_offset.into()));
-
         let proj = camera.projection(resp.rect.width(), resp.rect.height());
         let camera_tf = proj * camera.view();
-        let tf = Transform::from(rect_offset * camera_tf);
+        let tf = Transform::new(camera_tf, resp.rect);
 
         let mut three_ui = ThreeUi::new(ui.painter().clone(), tf);
 
