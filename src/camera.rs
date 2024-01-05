@@ -41,20 +41,14 @@ impl Camera {
         // Camera movement
         if response.dragged_by(egui::PointerButton::Primary) {
             if ui.input(|i| i.raw.modifiers.shift_only()) {
-                self.pan(
-                    response.drag_delta().x,
-                    response.drag_delta().y,
-                );
+                self.pan(response.drag_delta().x, response.drag_delta().y);
             } else {
                 self.pivot(response.drag_delta().x, response.drag_delta().y);
             }
         }
 
         if response.dragged_by(egui::PointerButton::Secondary) {
-            self.pan(
-                response.drag_delta().x,
-                response.drag_delta().y,
-            );
+            self.pan(response.drag_delta().x, response.drag_delta().y);
         }
 
         if response.hovered() {

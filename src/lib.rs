@@ -3,17 +3,18 @@
 mod camera;
 
 pub use camera::Camera;
+use egui::{Color32, Stroke};
 // glam's types are part of our interface
 // TODO: use mint? But then we'd have to convert every time ...
 pub use glam;
 pub use glam::Vec3;
 
-use glam::{Mat4, Vec4Swizzles, Vec3Swizzles, Mat3};
+use glam::{Mat3, Mat4, Vec3Swizzles, Vec4Swizzles};
 
 #[derive(Clone)]
 pub struct Painter3D {
     transform: Transform,
-    painter_2d: egui::Painter
+    painter_2d: egui::Painter,
 }
 
 // TODO: enum allowing custom transforms
@@ -80,18 +81,25 @@ impl Painter3D {
         }
     }
 
-    pub fn line(&self, a: Vec3, b: Vec3, stroke: egui::Stroke) {
+    pub fn line(&self, a: Vec3, b: Vec3, stroke: Stroke) {
         let Some(a) = self.transform(a) else { return };
         let Some(b) = self.transform(b) else { return };
 
         self.painter_2d.line_segment([a, b], stroke)
     }
 
-    /*
-    pub fn circle(&self, center: ) {
-        self.painter_2d.circle(self., radius, fill_color, stroke)
+    pub fn circle(
+        &self,
+        center: Vec3,
+        radius: f32,
+        fill_color: impl Into<Color32>,
+        stroke: impl Into<Stroke>,
+    ) {
+        let Some(center) = self.transform(center) else {
+            return;
+        };
+        self.painter_2d.circle(center, radius, fill_color, stroke)
     }
-    */
 
     fn transform(&self, pt: Vec3) -> Option<egui::Pos2> {
         let (sc, z) = self.transform.world_to_egui(pt);
@@ -165,7 +173,8 @@ impl ThreeWidget {
         let resp = ui.allocate_response(self.desired_size, egui::Sense::click_and_drag());
 
         // Get some inputs for the camera
-        let mut camera = ui.data_mut(|data| data.get_persisted_mut_or_default::<Camera>(self.id).clone());
+        let mut camera =
+            ui.data_mut(|data| data.get_persisted_mut_or_default::<Camera>(self.id).clone());
         camera.handle_response(&resp, ui);
 
         // Modify the camera stored
