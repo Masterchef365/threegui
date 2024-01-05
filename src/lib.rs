@@ -9,7 +9,7 @@ use egui::{Color32, Stroke};
 pub use glam;
 pub use glam::Vec3;
 
-use glam::{Mat3, Mat4, Vec3Swizzles, Vec4Swizzles};
+use glam::{Mat4, Vec3Swizzles, Vec4Swizzles};
 
 #[derive(Clone)]
 pub struct Painter3D {
@@ -55,7 +55,7 @@ impl Transform {
         (sc + self.rect.min.to_vec2(), dc.z)
     }
 
-    pub fn egui_to_world(&self, egui: egui::Vec2, z: f32) -> glam::Vec3 {
+    pub fn egui_to_world(&self, _egui: egui::Vec2, _z: f32) -> glam::Vec3 {
         /*
         let egui: mint::Vector2<f32> = egui.into();
         let egui: glam::Vec2 = egui.into();
@@ -88,30 +88,19 @@ impl Painter3D {
         self.painter_2d.line_segment([a, b], stroke)
     }
 
-    pub fn circle_filled(
-        &self,
-        center: Vec3,
-        radius: f32,
-        fill_color: impl Into<Color32>,
-    ) {
+    pub fn circle_filled(&self, center: Vec3, radius: f32, fill_color: impl Into<Color32>) {
         let Some(center) = self.transform(center) else {
             return;
         };
         self.painter_2d.circle_filled(center, radius, fill_color)
     }
 
-    pub fn circle(
-        &self,
-        center: Vec3,
-        radius: f32,
-        stroke: impl Into<Stroke>,
-    ) {
+    pub fn circle(&self, center: Vec3, radius: f32, stroke: impl Into<Stroke>) {
         let Some(center) = self.transform(center) else {
             return;
         };
         self.painter_2d.circle_stroke(center, radius, stroke)
     }
-
 
     fn transform(&self, pt: Vec3) -> Option<egui::Pos2> {
         let (sc, z) = self.transform.world_to_egui(pt);

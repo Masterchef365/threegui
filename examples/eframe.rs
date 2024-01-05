@@ -5,7 +5,7 @@ use egui::{Color32, Stroke};
 use glam::Vec3;
 
 impl eframe::App for MyEguiApp {
-    fn update(&mut self, ctx: &egui::Context, frame: &mut eframe::Frame) {
+    fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
         egui::CentralPanel::default().show(ctx, |ui| {
             threegui::threegui(ui, |three| {
                 let paint = three.painter();
@@ -37,16 +37,12 @@ impl eframe::App for MyEguiApp {
                     Stroke::new(1., Color32::LIGHT_BLUE),
                 );
 
-                paint.circle_filled(
-                    Vec3::new(0.3, -0.1, -0.3),
-                    4.0,
-                    Color32::LIGHT_BLUE,
-                );
+                paint.circle_filled(Vec3::new(0.3, -0.1, -0.3), 4.0, Color32::LIGHT_BLUE);
 
                 paint.circle(
                     Vec3::new(0.2, -0.4, 0.9),
                     4.0,
-                    Stroke::new(1., Color32::LIGHT_BLUE)
+                    Stroke::new(1., Color32::LIGHT_BLUE),
                 );
             })
         });
@@ -59,14 +55,15 @@ fn main() {
         "My egui App",
         native_options,
         Box::new(|cc| Box::new(MyEguiApp::new(cc))),
-    );
+    )
+    .unwrap();
 }
 
 #[derive(Default)]
 struct MyEguiApp {}
 
 impl MyEguiApp {
-    fn new(cc: &eframe::CreationContext<'_>) -> Self {
+    fn new(_cc: &eframe::CreationContext<'_>) -> Self {
         Self::default()
     }
 }
