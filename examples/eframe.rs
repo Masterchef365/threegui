@@ -8,7 +8,7 @@ use glam::Vec3;
 use threegui::utils;
 
 impl eframe::App for MyEguiApp {
-    fn update(&mut self, ctx: &egui::Context, frame: &mut eframe::Frame) {
+    fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
         ctx.request_repaint();
 
         egui::CentralPanel::default().show(ctx, |ui| {

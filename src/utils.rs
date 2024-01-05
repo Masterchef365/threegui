@@ -1,9 +1,9 @@
-use egui::{Color32, Stroke};
+use egui::Stroke;
 pub use glam::Vec3;
 
 use crate::Painter3D;
 
-pub fn grid(paint: &Painter3D, n: usize, scale: f32, stroke: Stroke) {
+pub fn grid(paint: &Painter3D, _n: usize, scale: f32, stroke: Stroke) {
     let k = 10;
     let f = k as f32;
     for i in -k..=k {
