@@ -8,7 +8,7 @@ pub use camera::Camera;
 pub use glam;
 pub use glam::Vec3;
 
-use glam::{Mat4, Vec4Swizzles, Mat3};
+use glam::{Mat4, Vec4Swizzles, Vec3Swizzles, Mat3};
 
 #[derive(Clone)]
 pub struct Painter3D {
@@ -33,24 +33,25 @@ impl Transform {
         }
     }
 
-    pub fn world_to_egui(&self, world: glam::Vec3) -> egui::Vec2 {
+    /// Returns egui coordinates and z value for the given point
+    pub fn world_to_egui(&self, world: glam::Vec3) -> (egui::Vec2, f32) {
         // World to "device coordinates"
         let pre: glam::Vec4 = self.mat * world.extend(1.);
 
         // Perspective division
-        let mut v = pre.xy() / pre.w;
+        let mut dc = pre.xyz() / pre.w;
 
         // Invert Y
-        v.y *= -1.0;
+        dc.y *= -1.0;
 
         // Map to screen coordinates
-        let v = (v + 1.) / 2.;
-        let v = v * glam::Vec2::new(self.rect.width(), self.rect.height());
+        let v = (dc + 1.) / 2.;
+        let sc = v.xy() * glam::Vec2::new(self.rect.width(), self.rect.height());
 
-        let v: mint::Vector2<f32> = v.into();
-        let v: egui::Vec2 = v.into();
+        let sc: mint::Vector2<f32> = sc.into();
+        let sc: egui::Vec2 = sc.into();
 
-        v + self.rect.min.to_vec2()
+        (sc + self.rect.min.to_vec2(), v.z)
     }
 
     pub fn egui_to_world(&self, egui: egui::Vec2, z: f32) -> glam::Vec3 {
@@ -84,8 +85,14 @@ impl Painter3D {
         self.painter_2d.line_segment(line, stroke)
     }
 
+    /*
+    pub fn circle(&self, center: ) {
+        self.painter_2d.circle(self., radius, fill_color, stroke)
+    }
+    */
+
     fn transform(&self, pt: Vec3) -> egui::Vec2 {
-        self.transform.world_to_egui(pt)
+        self.transform.world_to_egui(pt).0
     }
 
     /*
