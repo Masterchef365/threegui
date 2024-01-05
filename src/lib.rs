@@ -81,7 +81,7 @@ impl Painter3D {
         Self {
             transform: self.transform.prepend(Transform::from(mat)),
             // Context is Arc underneath so this is cheap
-            ctx: self.ctx.clone()
+            ctx: self.ctx.clone(),
         }
     }
 }
@@ -100,8 +100,11 @@ impl Camera {
 }
 
 impl ThreeUi {
-    pub fn new(ctx: Context) -> Self {
-
+    pub fn new(ctx: egui::Context) -> Self {
+        Self {
+            camera: Camera::default(),
+            painter: Painter3D::new(ctx),
+        }
     }
     /*
     pub fn fly_to(&mut self, destination: Vec3) {
@@ -152,7 +155,6 @@ impl ThreeWidget {
             camera.clone()
         });
 
-        
         let mut three_ui = ThreeUi::new(ui.ctx().clone());
 
         user_func(&mut three_ui);
