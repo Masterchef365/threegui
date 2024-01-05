@@ -42,15 +42,26 @@ impl Transform {
     }
 
     pub fn world_to_egui(&self, world: glam::Vec3) -> egui::Vec2 {
-        let v: mint::Vector2<f32> = (self.mat * world.extend(1.)).xy().into();
+        let pre: glam::Vec4 = self.mat * world.extend(1.);
+
+        dbg!(self.mat);
+
+        // Perspective division
+        let v = pre.xy() / pre.w;
+        dbg!(v);
+
+        let v: mint::Vector2<f32> = v.into();
         v.into()
     }
 
     pub fn egui_to_world(&self, egui: egui::Vec2, z: f32) -> glam::Vec3 {
+        /*
         let egui: mint::Vector2<f32> = egui.into();
         let egui: glam::Vec2 = egui.into();
         let egui = egui.extend(z);
         (self.inverse * egui.extend(1.)).xyz()
+        */
+        todo!()
     }
 
     /// Returns a Transform which has the given transformation prepended
@@ -83,8 +94,7 @@ impl Painter3D {
     }
 
     fn transf(&self, pt: Vec3) -> egui::Vec2 {
-        let result: mint::Vector2<f32> = (self.transform.mat * pt.extend(1.)).xy().into();
-        result.into()
+        self.transform.world_to_egui(pt)
     }
 
     /// Returns a painter which has the given transformation prepended
@@ -167,8 +177,7 @@ impl ThreeWidget {
 
         let proj = camera.projection(resp.rect.width(), resp.rect.height());
         let camera_tf = proj * camera.view();
-        dbg!(rect_offset);
-        let tf = Transform::from(dbg!(rect_offset * camera_tf));
+        let tf = Transform::from(rect_offset * camera_tf);
 
         let mut three_ui = ThreeUi::new(ui.painter().clone(), tf);
 
