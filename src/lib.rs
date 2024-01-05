@@ -147,15 +147,22 @@ impl ThreeWidget {
         ui: &mut egui::Ui,
         mut user_func: impl FnMut(&mut ThreeUi) + Sized,
     ) -> egui::Response {
+        // Allocate area to draw
         let desired_size = ui.available_size().min(self.max_size);
         let resp = ui.allocate_response(desired_size, egui::Sense::click_and_drag());
 
+        // Get some inputs for the camera
+        let modifiers = ui.input(|input| input.modifiers);
+        let scroll_delta = ui.input(|input| input.scroll_delta.y);
+
+        // Modify the camera and get it's state
         let camera = ui.data_mut(|data| {
             let camera = data.get_persisted_mut_or_default::<Camera>(self.id);
-            camera.handle_response(&resp, ui);
+            camera.handle_response(&resp, modifiers, scroll_delta);
             camera.clone()
         });
 
+        // Get the transform that puts the model on the screen
         let rect_offset: mint::Vector2<f32> = resp.rect.min.to_vec2().into();
         let rect_offset: Mat4 = Mat4::from_mat3(Mat3::from_translation(rect_offset.into()));
 
