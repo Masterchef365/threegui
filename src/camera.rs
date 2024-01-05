@@ -142,7 +142,7 @@ impl Default for ArcBall {
             pivot: Vec3::ZERO,
             pitch: 0.3,
             yaw: -1.92,
-            distance: 30.,
+            distance: 3.,
         }
     }
 }
