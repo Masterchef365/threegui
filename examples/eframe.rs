@@ -37,18 +37,16 @@ impl eframe::App for MyEguiApp {
                     Stroke::new(1., Color32::LIGHT_BLUE),
                 );
 
-                paint.circle(
+                paint.circle_filled(
                     Vec3::new(0.3, -0.1, -0.3),
                     4.0,
                     Color32::LIGHT_BLUE,
-                    Stroke::NONE,
                 );
 
                 paint.circle(
                     Vec3::new(0.2, -0.4, 0.9),
                     4.0,
-                    Color32::LIGHT_BLUE,
-                    Stroke::NONE,
+                    Stroke::new(1., Color32::LIGHT_BLUE)
                 );
             })
         });

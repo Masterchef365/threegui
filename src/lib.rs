@@ -88,18 +88,30 @@ impl Painter3D {
         self.painter_2d.line_segment([a, b], stroke)
     }
 
-    pub fn circle(
+    pub fn circle_filled(
         &self,
         center: Vec3,
         radius: f32,
         fill_color: impl Into<Color32>,
+    ) {
+        let Some(center) = self.transform(center) else {
+            return;
+        };
+        self.painter_2d.circle_filled(center, radius, fill_color)
+    }
+
+    pub fn circle(
+        &self,
+        center: Vec3,
+        radius: f32,
         stroke: impl Into<Stroke>,
     ) {
         let Some(center) = self.transform(center) else {
             return;
         };
-        self.painter_2d.circle(center, radius, fill_color, stroke)
+        self.painter_2d.circle_stroke(center, radius, stroke)
     }
+
 
     fn transform(&self, pt: Vec3) -> Option<egui::Pos2> {
         let (sc, z) = self.transform.world_to_egui(pt);
