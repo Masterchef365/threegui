@@ -10,9 +10,10 @@ pub use glam::Vec3;
 
 use glam::{Mat4, Vec4Swizzles};
 
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Debug)]
 pub struct Painter3D {
     transform: Transform,
+    ctx: egui::Context,
 }
 
 // TODO: enum allowing custom transforms
@@ -68,9 +69,10 @@ impl From<Mat4> for Transform {
 }
 
 impl Painter3D {
-    pub fn new() -> Self {
+    pub fn new(ctx: egui::Context) -> Self {
         Self {
             transform: Transform::identity(),
+            ctx,
         }
     }
 
@@ -78,12 +80,15 @@ impl Painter3D {
     pub fn transform(&self, mat: Mat4) -> Self {
         Self {
             transform: self.transform.prepend(Transform::from(mat)),
+            // Context is Arc underneath so this is cheap
+            ctx: self.ctx.clone()
         }
     }
 }
 
 pub struct ThreeUi {
     camera: Camera,
+    painter: Painter3D,
 }
 
 impl Camera {
@@ -95,16 +100,16 @@ impl Camera {
 }
 
 impl ThreeUi {
+    pub fn new(ctx: Context) -> Self {
+
+    }
     /*
     pub fn fly_to(&mut self, destination: Vec3) {
         todo!()
     }
     */
-}
-
-impl Default for ThreeUi {
-    fn default() -> Self {
-        Self { camera: Camera::default() }
+    pub fn painter(&self) -> &Painter3D {
+        &self.painter
     }
 }
 
@@ -128,21 +133,29 @@ impl ThreeWidget {
         }
     }
 
-    pub fn max_size(size: egui::Vec2) {
-        todo!()
+    pub fn with_max_size(mut self, size: egui::Vec2) -> Self {
+        self.max_size = size;
+        self
     }
 
     pub fn show(
         &mut self,
         ui: &mut egui::Ui,
-        user_func: impl FnMut(&mut ThreeUi) + Sized,
+        mut user_func: impl FnMut(&mut ThreeUi) + Sized,
     ) -> egui::Response {
         let desired_size = ui.available_size().min(self.max_size);
         let resp = ui.allocate_response(desired_size, egui::Sense::click_and_drag());
 
-        let camera: Option<Camera> = ui.data_mut(|data| {
-            data.get_temp(self.id).clone()
+        let camera = ui.data_mut(|data| {
+            let camera = data.get_persisted_mut_or_default::<Camera>(self.id);
+            // TODO: Camera interaction
+            camera.clone()
         });
+
+        
+        let mut three_ui = ThreeUi::new(ui.ctx().clone());
+
+        user_func(&mut three_ui);
 
         resp
     }
