@@ -34,7 +34,7 @@ impl eframe::App for MyEguiApp {
                 paint.line(
                     Vec3::new(1., 0.5, 0.9),
                     Vec3::new(-1., -0.1, 0.3),
-                    Stroke::new(1., Color32::RED),
+                    Stroke::new(3., Color32::RED),
                 );
                 paint.line(
                     Vec3::new(0.3, -0.1, -0.3),
@@ -48,13 +48,13 @@ impl eframe::App for MyEguiApp {
                     paint.line(
                         Vec3::new(-1., 0., i as f32 / f),
                         Vec3::new(1., 0., i as f32 / f),
-                        Stroke::new(1., Color32::WHITE),
+                        Stroke::new(0.5, Color32::WHITE),
                     );
 
                     paint.line(
                         Vec3::new(i as f32 / f, 0., -1.),
                         Vec3::new(i as f32 / f, 0., 1.),
-                        Stroke::new(1., Color32::WHITE),
+                        Stroke::new(0.5, Color32::WHITE),
                     );
                 }
             })
