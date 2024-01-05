@@ -34,6 +34,7 @@ impl Transform {
     }
 
     pub fn world_to_egui(&self, world: glam::Vec3) -> egui::Vec2 {
+        // World to "device coordinates"
         let pre: glam::Vec4 = self.mat * world.extend(1.);
 
         // Perspective division
@@ -42,6 +43,7 @@ impl Transform {
         // Invert Y
         v.y *= -1.0;
 
+        // Map to screen coordinates
         let v = (v + 1.) / 2.;
         let v = v * glam::Vec2::new(self.rect.width(), self.rect.height());
 
@@ -78,12 +80,11 @@ impl Painter3D {
     }
 
     pub fn line(&self, a: Vec3, b: Vec3, stroke: egui::Stroke) {
-        let a = self.transf(a);
-        let b = self.transf(b);
-        self.painter_2d.line_segment([a.to_pos2(), b.to_pos2()], stroke)
+        let line = [a, b].map(|x| self.transform(x).to_pos2());
+        self.painter_2d.line_segment(line, stroke)
     }
 
-    fn transf(&self, pt: Vec3) -> egui::Vec2 {
+    fn transform(&self, pt: Vec3) -> egui::Vec2 {
         self.transform.world_to_egui(pt)
     }
 
