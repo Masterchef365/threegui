@@ -152,14 +152,13 @@ impl ThreeWidget {
         let resp = ui.allocate_response(desired_size, egui::Sense::click_and_drag());
 
         // Get some inputs for the camera
-        let modifiers = ui.input(|input| input.modifiers);
-        let scroll_delta = ui.input(|input| input.scroll_delta.y);
+        let mut camera = ui.data_mut(|data| data.get_persisted_mut_or_default::<Camera>(self.id).clone());
+        camera.handle_response(&resp, ui);
 
-        // Modify the camera and get it's state
-        let camera = ui.data_mut(|data| {
-            let camera = data.get_persisted_mut_or_default::<Camera>(self.id);
-            camera.handle_response(&resp, modifiers, scroll_delta);
-            camera.clone()
+        // Modify the camera stored
+        ui.data_mut(|data| {
+            *data.get_persisted_mut_or_default(self.id) = camera;
+            // NOTE: Cannot use handle_response here as it deadlocks due to Response's Context
         });
 
         // Get the transform that puts the model on the screen
