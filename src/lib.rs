@@ -102,6 +102,18 @@ impl Painter3D {
         self.painter_2d.circle_stroke(center, radius, stroke)
     }
 
+    pub fn text(
+        &self,
+        pos: Vec3,
+        anchor: egui::Align2,
+        text: impl ToString,
+        font_id: egui::FontId,
+        text_color: Color32,
+    ) -> Option<egui::Rect> {
+        self.transform(pos)
+            .map(|pos| self.painter_2d.text(pos, anchor, text, font_id, text_color))
+    }
+
     fn transform(&self, pt: Vec3) -> Option<egui::Pos2> {
         let (sc, z) = self.transform.world_to_egui(pt);
 

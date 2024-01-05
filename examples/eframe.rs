@@ -14,6 +14,10 @@ impl eframe::App for MyEguiApp {
             threegui::threegui(ui, |three| {
                 let paint = three.painter();
 
+                let pt = Vec3::new(-0.5, 0.5, -0.5);
+                paint.text(pt, egui::Align2::LEFT_CENTER, " Heyo", egui::FontId::default(), Color32::GOLD);
+                paint.circle_filled(pt, 2.0, Color32::GOLD);
+
                 let k = 10;
                 let f = k as f32;
                 for i in -k..=k {
