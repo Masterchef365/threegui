@@ -15,8 +15,10 @@ impl eframe::App for MyEguiApp {
             threegui::threegui(ui, |three| {
                 let paint = three.painter();
 
+                // Grid underneath it all
                 utils::grid(paint, 10, 1.0, egui::Stroke::new(1.0, Color32::DARK_GRAY));
 
+                // Text
                 let pt = Vec3::new(-0.5, 0.5, -0.5);
                 paint.text(
                     pt,
@@ -25,8 +27,10 @@ impl eframe::App for MyEguiApp {
                     egui::FontId::default(),
                     Color32::GOLD,
                 );
+                // Circle
                 paint.circle_filled(pt, 2.0, Color32::GOLD);
 
+                // Rectangle
                 let pt = Vec3::new(0.5, -0.5, -0.5);
                 if let Some(pos) = paint.transform(pt) {
                     let rect = egui::Rect::from_min_size(pos, egui::Vec2::new(30., 30.));
@@ -35,12 +39,16 @@ impl eframe::App for MyEguiApp {
                         .rect(rect, egui::Rounding::ZERO, Color32::BLUE, Stroke::NONE);
                 }
 
+                // Red line
                 paint.line(
                     Vec3::new(1., 0.5, 0.9),
                     Vec3::new(-1., -0.1, 0.3),
                     Stroke::new(3., Color32::RED),
                 );
 
+                //let pt = Vec3::new(-0.5, 0.5, 0.5);
+
+                // Blue line
                 let a = Vec3::new(self.start.elapsed().as_secs_f32().cos(), 0.1, -0.3);
                 let b = Vec3::new(0.2, 0.4, 0.9);
 
@@ -52,6 +60,7 @@ impl eframe::App for MyEguiApp {
                     Stroke::new(5., Color32::GREEN),
                 );
 
+                // Blue line's end caps
                 paint.circle_filled(a, 4.0, Color32::LIGHT_BLUE);
 
                 paint.circle(b, 4.0, Stroke::new(1., Color32::LIGHT_BLUE));
