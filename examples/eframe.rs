@@ -5,6 +5,7 @@ use std::time::Instant;
 use eframe::egui;
 use egui::{Color32, Stroke};
 use glam::Vec3;
+use threegui::utils;
 
 impl eframe::App for MyEguiApp {
     fn update(&mut self, ctx: &egui::Context, frame: &mut eframe::Frame) {
@@ -14,24 +15,24 @@ impl eframe::App for MyEguiApp {
             threegui::threegui(ui, |three| {
                 let paint = three.painter();
 
+                utils::grid(paint, 10, 1.0, egui::Stroke::new(1.0, Color32::DARK_GRAY));
+
                 let pt = Vec3::new(-0.5, 0.5, -0.5);
-                paint.text(pt, egui::Align2::LEFT_CENTER, " Heyo", egui::FontId::default(), Color32::GOLD);
+                paint.text(
+                    pt,
+                    egui::Align2::LEFT_CENTER,
+                    " Heyo",
+                    egui::FontId::default(),
+                    Color32::GOLD,
+                );
                 paint.circle_filled(pt, 2.0, Color32::GOLD);
 
-                let k = 10;
-                let f = k as f32;
-                for i in -k..=k {
-                    paint.line(
-                        Vec3::new(-1., 0., i as f32 / f),
-                        Vec3::new(1., 0., i as f32 / f),
-                        Stroke::new(0.5, Color32::WHITE),
-                    );
-
-                    paint.line(
-                        Vec3::new(i as f32 / f, 0., -1.),
-                        Vec3::new(i as f32 / f, 0., 1.),
-                        Stroke::new(0.5, Color32::WHITE),
-                    );
+                let pt = Vec3::new(0.5, -0.5, -0.5);
+                if let Some(pos) = paint.transform(pt) {
+                    let rect = egui::Rect::from_min_size(pos, egui::Vec2::new(30., 30.));
+                    paint
+                        .egui()
+                        .rect(rect, egui::Rounding::ZERO, Color32::BLUE, Stroke::NONE);
                 }
 
                 paint.line(

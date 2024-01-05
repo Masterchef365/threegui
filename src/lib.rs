@@ -1,6 +1,7 @@
 //! Extension to `egui` for 3D drawings
 
-mod camera;
+pub mod camera;
+pub mod utils;
 
 pub use camera::Camera;
 use egui::{Color32, Stroke};
@@ -114,10 +115,20 @@ impl Painter3D {
             .map(|pos| self.painter_2d.text(pos, anchor, text, font_id, text_color))
     }
 
-    fn transform(&self, pt: Vec3) -> Option<egui::Pos2> {
+    /// Transform a point in world coordinates to egui coordinates
+    pub fn transform(&self, pt: Vec3) -> Option<egui::Pos2> {
         let (sc, z) = self.transform.world_to_egui(pt);
 
         (0.0..=1.0).contains(&z).then(|| sc.to_pos2())
+    }
+
+    pub fn internal_transform(&self) -> &Transform {
+        &self.transform
+    }
+
+    /// Get egui's 2D painter
+    pub fn egui(&self) -> &egui::Painter {
+        &self.painter_2d
     }
 
     /*
