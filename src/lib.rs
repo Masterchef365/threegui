@@ -2,18 +2,18 @@
 
 mod camera;
 
-use camera::Camera;
+pub use camera::Camera;
 // glam's types are part of our interface
 // TODO: use mint? But then we'd have to convert every time ...
 pub use glam;
 pub use glam::Vec3;
 
-use glam::{Mat4, Vec4Swizzles};
+use glam::{Mat4, Vec4Swizzles, Mat3};
 
-#[derive(Clone, Debug)]
+#[derive(Clone)]
 pub struct Painter3D {
     transform: Transform,
-    ctx: egui::Context,
+    painter_2d: egui::Painter
 }
 
 // TODO: enum allowing custom transforms
@@ -69,11 +69,22 @@ impl From<Mat4> for Transform {
 }
 
 impl Painter3D {
-    pub fn new(ctx: egui::Context) -> Self {
+    pub fn new(painter_2d: egui::Painter, transform: Transform) -> Self {
         Self {
             transform: Transform::identity(),
-            ctx,
+            painter_2d,
         }
+    }
+
+    pub fn line(&self, a: Vec3, b: Vec3, stroke: egui::Stroke) {
+        let a = self.transf(a);
+        let b = self.transf(b);
+        self.painter_2d.line_segment([a.to_pos2(), b.to_pos2()], stroke)
+    }
+
+    fn transf(&self, pt: Vec3) -> egui::Vec2 {
+        let result: mint::Vector2<f32> = (self.transform.mat * pt.extend(1.)).xy().into();
+        result.into()
     }
 
     /// Returns a painter which has the given transformation prepended
@@ -81,29 +92,19 @@ impl Painter3D {
         Self {
             transform: self.transform.prepend(Transform::from(mat)),
             // Context is Arc underneath so this is cheap
-            ctx: self.ctx.clone(),
+            painter_2d: self.painter_2d.clone(),
         }
     }
 }
 
 pub struct ThreeUi {
-    camera: Camera,
     painter: Painter3D,
 }
 
-impl Camera {
-    fn process_response(&mut self, resp: egui::Response) {}
-
-    pub fn transform(&mut self) -> Mat4 {
-        todo!()
-    }
-}
-
 impl ThreeUi {
-    pub fn new(ctx: egui::Context) -> Self {
+    pub fn new(painter: egui::Painter, tf: Transform) -> Self {
         Self {
-            camera: Camera::default(),
-            painter: Painter3D::new(ctx),
+            painter: Painter3D::new(painter, tf),
         }
     }
     /*
@@ -151,11 +152,19 @@ impl ThreeWidget {
 
         let camera = ui.data_mut(|data| {
             let camera = data.get_persisted_mut_or_default::<Camera>(self.id);
-            // TODO: Camera interaction
+            camera.handle_response(&resp, ui);
             camera.clone()
         });
 
-        let mut three_ui = ThreeUi::new(ui.ctx().clone());
+        let rect_offset: mint::Vector2<f32> = resp.rect.min.to_vec2().into();
+        let rect_offset: Mat4 = Mat4::from_mat3(Mat3::from_translation(rect_offset.into()));
+
+        let proj = camera.projection(resp.rect.width(), resp.rect.height());
+        let camera_tf = proj * camera.view();
+        dbg!(rect_offset);
+        let tf = Transform::from(dbg!(rect_offset * camera_tf));
+
+        let mut three_ui = ThreeUi::new(ui.painter().clone(), tf);
 
         user_func(&mut three_ui);
 
