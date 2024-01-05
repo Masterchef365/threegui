@@ -38,6 +38,9 @@ impl Transform {
         // World to "device coordinates"
         let pre: glam::Vec4 = self.mat * world.extend(1.);
 
+        //dbg!(self.mat);
+        dbg!(pre.z);
+
         // Perspective division
         let mut dc = pre.xyz() / pre.w;
 
@@ -45,13 +48,13 @@ impl Transform {
         dc.y *= -1.0;
 
         // Map to screen coordinates
-        let v = (dc + 1.) / 2.;
-        let sc = v.xy() * glam::Vec2::new(self.rect.width(), self.rect.height());
+        let sc = (dc + 1.) / 2.;
+        let sc = sc.xy() * glam::Vec2::new(self.rect.width(), self.rect.height());
 
         let sc: mint::Vector2<f32> = sc.into();
         let sc: egui::Vec2 = sc.into();
 
-        (sc + self.rect.min.to_vec2(), v.z)
+        (sc + self.rect.min.to_vec2(), dc.z)
     }
 
     pub fn egui_to_world(&self, egui: egui::Vec2, z: f32) -> glam::Vec3 {
@@ -81,8 +84,10 @@ impl Painter3D {
     }
 
     pub fn line(&self, a: Vec3, b: Vec3, stroke: egui::Stroke) {
-        let line = [a, b].map(|x| self.transform(x).to_pos2());
-        self.painter_2d.line_segment(line, stroke)
+        let Some(a) = self.transform(a) else { return };
+        let Some(b) = self.transform(b) else { return };
+
+        self.painter_2d.line_segment([a, b], stroke)
     }
 
     /*
@@ -91,8 +96,10 @@ impl Painter3D {
     }
     */
 
-    fn transform(&self, pt: Vec3) -> egui::Vec2 {
-        self.transform.world_to_egui(pt).0
+    fn transform(&self, pt: Vec3) -> Option<egui::Pos2> {
+        let (sc, z) = self.transform.world_to_egui(pt);
+
+        (z > 0.0).then(|| sc.to_pos2())
     }
 
     /*
