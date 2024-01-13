@@ -82,14 +82,14 @@ impl Painter3D {
         }
     }
 
-    pub fn arrow(&self, pos: Vec3, dir: Vec3, stroke: Stroke) {
+    pub fn arrow(&self, pos: Vec3, dir: Vec3, screen_len: f32, stroke: Stroke) {
         let a = pos;
         let b = pos + dir;
 
         let Some(a) = self.transform(a) else { return };
         let Some(b) = self.transform(b) else { return };
 
-        self.painter_2d.arrow(a, b - a, stroke)
+        self.painter_2d.arrow(a, (b - a).normalized() * screen_len, stroke)
     }
 
     pub fn line(&self, a: Vec3, b: Vec3, stroke: Stroke) {
