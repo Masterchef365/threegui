@@ -3,6 +3,7 @@ use std::f32::consts::FRAC_PI_2;
 use glam::{Mat4, Vec3, Vec4, Vec4Swizzles};
 
 /// Camera controller and parameters
+#[derive(serde::Serialize, serde::Deserialize)]
 #[derive(Default, Copy, Clone)]
 pub struct Camera {
     pub proj: Perspective,
@@ -52,12 +53,13 @@ impl Camera {
         }
 
         if response.hovered() {
-            self.zoom(ui.input(|i| i.scroll_delta.y));
+            self.zoom(ui.input(|i| -i.scroll_delta.y));
         }
     }
 }
 
 /// Perspective projection parameters
+#[derive(serde::Serialize, serde::Deserialize)]
 #[derive(Copy, Clone)]
 pub struct Perspective {
     pub fov: f32,
@@ -67,6 +69,7 @@ pub struct Perspective {
 
 /// Arcball camera parameters
 #[derive(Copy, Clone)]
+#[derive(serde::Serialize, serde::Deserialize)]
 pub struct ArcBall {
     pub pivot: Vec3,
     pub distance: f32,
@@ -76,6 +79,7 @@ pub struct ArcBall {
 
 /// Arcball camera controller parameters
 #[derive(Copy, Clone)]
+#[derive(serde::Serialize, serde::Deserialize)]
 pub struct ArcBallController {
     pub pan_sensitivity: f32,
     pub swivel_sensitivity: f32,
