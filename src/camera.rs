@@ -53,7 +53,7 @@ impl Camera {
         }
 
         if response.hovered() {
-            self.zoom(ui.input(|i| -i.scroll_delta.y));
+            self.zoom(ui.input(|i| -i.raw_scroll_delta.y));
         }
     }
 }

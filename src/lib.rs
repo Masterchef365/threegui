@@ -96,21 +96,21 @@ impl Painter3D {
         let Some(a) = self.transform(a) else { return };
         let Some(b) = self.transform(b) else { return };
 
-        self.painter_2d.line_segment([a, b], stroke)
+        self.painter_2d.line_segment([a, b], stroke);
     }
 
     pub fn circle_filled(&self, center: Vec3, radius: f32, fill_color: impl Into<Color32>) {
         let Some(center) = self.transform(center) else {
             return;
         };
-        self.painter_2d.circle_filled(center, radius, fill_color)
+        self.painter_2d.circle_filled(center, radius, fill_color);
     }
 
     pub fn circle(&self, center: Vec3, radius: f32, stroke: impl Into<Stroke>) {
         let Some(center) = self.transform(center) else {
             return;
         };
-        self.painter_2d.circle_stroke(center, radius, stroke)
+        self.painter_2d.circle_stroke(center, radius, stroke);
     }
 
     pub fn text(
