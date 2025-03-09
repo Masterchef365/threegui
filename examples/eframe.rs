@@ -3,7 +3,7 @@
 use std::time::Instant;
 
 use eframe::egui;
-use egui::{Color32, Stroke};
+use egui::{Color32, Stroke, StrokeKind};
 use glam::Vec3;
 use threegui::utils;
 
@@ -36,7 +36,7 @@ impl eframe::App for MyEguiApp {
                     let rect = egui::Rect::from_min_size(pos, egui::Vec2::new(30., 30.));
                     paint
                         .egui()
-                        .rect(rect, egui::Rounding::ZERO, Color32::BLUE, Stroke::NONE);
+                        .rect(rect, egui::Rounding::ZERO, Color32::BLUE, Stroke::NONE, StrokeKind::Outside);
                 }
 
                 // Red line
