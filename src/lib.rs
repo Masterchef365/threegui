@@ -155,12 +155,14 @@ impl Painter3D {
 
 pub struct ThreeUi {
     painter: Painter3D,
+    pub resp: egui::Response,
 }
 
 impl ThreeUi {
-    pub fn new(painter: egui::Painter, tf: Transform) -> Self {
+    pub fn new(painter: egui::Painter, tf: Transform, resp: egui::Response) -> Self {
         Self {
             painter: Painter3D::new(painter, tf),
+            resp,
         }
     }
     /*
@@ -221,7 +223,7 @@ impl ThreeWidget {
         let camera_tf = proj * camera.view();
         let tf = Transform::new(camera_tf, resp.rect);
 
-        let mut three_ui = ThreeUi::new(ui.painter_at(resp.rect), tf);
+        let mut three_ui = ThreeUi::new(ui.painter_at(resp.rect), tf, resp.clone());
 
         user_func(&mut three_ui);
 
