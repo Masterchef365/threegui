@@ -156,6 +156,7 @@ impl Painter3D {
 pub struct ThreeUi {
     painter: Painter3D,
     pub resp: egui::Response,
+    surpress_camera: bool,
 }
 
 impl ThreeUi {
@@ -163,6 +164,7 @@ impl ThreeUi {
         Self {
             painter: Painter3D::new(painter, tf),
             resp,
+            surpress_camera: false,
         }
     }
     /*
@@ -172,6 +174,11 @@ impl ThreeUi {
     */
     pub fn painter(&self) -> &Painter3D {
         &self.painter
+    }
+
+    /// surpress camera motion
+    pub fn surpress_camera(&mut self) {
+        self.surpress_camera = true;
     }
 }
 
@@ -211,14 +218,7 @@ impl ThreeWidget {
         // Get some inputs for the camera
         let mut camera =
             ui.data_mut(|data| data.get_persisted_mut_or_default::<Camera>(self.id).clone());
-        camera.handle_response(&resp, ui);
-
-        // Modify the camera stored
-        ui.data_mut(|data| {
-            *data.get_persisted_mut_or_default(self.id) = camera;
-            // NOTE: Cannot use handle_response here as it deadlocks due to Response's Context
-        });
-
+        
         let proj = camera.projection(resp.rect.width(), resp.rect.height());
         let camera_tf = proj * camera.view();
         let tf = Transform::new(camera_tf, resp.rect);
@@ -226,6 +226,16 @@ impl ThreeWidget {
         let mut three_ui = ThreeUi::new(ui.painter_at(resp.rect), tf, resp.clone());
 
         user_func(&mut three_ui);
+
+        if !three_ui.surpress_camera {
+            camera.handle_response(&resp, ui);
+
+            // Modify the camera stored
+            ui.data_mut(|data| {
+                *data.get_persisted_mut_or_default(self.id) = camera;
+                // NOTE: Cannot use handle_response here as it deadlocks due to Response's Context
+            });
+        }
 
         resp
     }
